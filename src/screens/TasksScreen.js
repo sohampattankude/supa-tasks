@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Alert,
   SafeAreaView,
+  StatusBar,
 } from 'react-native';
 import { supabase } from '../supabase';
 import TaskItem from '../components/TaskItem';
@@ -149,6 +150,7 @@ export default function TasksScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
       <View style={styles.header}>
         <Text style={styles.title}>My Tasks</Text>
         <TouchableOpacity onPress={signOut} style={styles.signOutButton}>
@@ -197,6 +199,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 16,
+    paddingTop: 20, // Extra padding for status bar
     backgroundColor: 'white',
     borderBottomWidth: 1,
     borderBottomColor: '#eee',

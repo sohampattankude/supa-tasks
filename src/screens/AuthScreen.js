@@ -8,6 +8,8 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  SafeAreaView,
+  StatusBar,
 } from 'react-native';
 import { supabase } from '../supabase';
 
@@ -32,14 +34,14 @@ export default function AuthScreen() {
 
     try {
       if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
         });
         if (error) throw error;
         Alert.alert('Success', 'Check your email for verification link');
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
@@ -53,11 +55,13 @@ export default function AuthScreen() {
   };
 
   return (
-    <KeyboardAvoidingView 
-      style={styles.container} 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <View style={styles.formContainer}>
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#f5f5f5" />
+      <KeyboardAvoidingView 
+        style={styles.keyboardContainer} 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <View style={styles.formContainer}>
         <Text style={styles.title}>SupaTasks</Text>
         <Text style={styles.subtitle}>
           {isSignUp ? 'Create your account' : 'Welcome back'}
@@ -103,8 +107,9 @@ export default function AuthScreen() {
             }
           </Text>
         </TouchableOpacity>
-      </View>
-    </KeyboardAvoidingView>
+        </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
@@ -113,10 +118,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f5f5f5',
   },
+  keyboardContainer: {
+    flex: 1,
+  },
   formContainer: {
     flex: 1,
     justifyContent: 'center',
     paddingHorizontal: 20,
+    paddingTop: 40, // Extra padding for status bar
   },
   title: {
     fontSize: 32,

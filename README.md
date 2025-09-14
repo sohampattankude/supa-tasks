@@ -1,34 +1,27 @@
-# SupaTasks 📱
+# SupaTasks
 
-A cross-platform React Native mobile app for personal task management with secure authentication and real-time updates powered by Supabase.
+A simple task management app I built using React Native and Supabase. I wanted to create something that actually works well on mobile and doesn't require a complex backend setup.
 
-## 🚀 Features
+## What it does
 
-- **Secure Authentication**: Email/password sign-up and sign-in with persistent sessions
-- **Task Management**: Full CRUD operations (Create, Read, Update, Delete) for personal tasks
-- **Real-time Updates**: Live synchronization across devices using Supabase real-time subscriptions
-- **Row-Level Security**: Complete data isolation - users can only access their own tasks
-- **Cross-platform**: Works on iOS, Android, and Web
-- **Modern UI**: Clean, intuitive interface with smooth animations
+- Sign up/sign in with email and password
+- Add, edit, and delete your personal tasks
+- Tasks sync in real-time across devices
+- Each user only sees their own tasks (security built-in)
+- Works on Android, iOS, and web
 
-## 🛠 Tech Stack
+## Tech I used
 
-- **Frontend**: React Native with Expo
-- **Backend**: Supabase (PostgreSQL + Auth + Real-time)
-- **Navigation**: React Navigation v6
-- **Storage**: AsyncStorage for session persistence
-- **State Management**: React Hooks (useState, useEffect)
+- React Native with Expo (because it's fast to develop with)
+- Supabase for backend (auth + database + real-time)
+- React Navigation for screen transitions
+- AsyncStorage to keep users logged in
 
-## 📋 Prerequisites
+## Getting started
 
-- Node.js (v16 or higher)
-- npm or yarn
-- Expo CLI (`npm install -g @expo/cli`)
-- Supabase account
+You'll need Node.js and a Supabase account.
 
-## 🚀 Quick Start
-
-### 1. Clone and Install
+### 1. Clone and install
 
 ```bash
 git clone <your-repo-url>
@@ -36,23 +29,17 @@ cd supa-tasks
 npm install
 ```
 
-### 2. Supabase Setup
+### 2. Set up Supabase
 
-1. Create a new project at [supabase.com](https://supabase.com)
-2. Go to Settings > API to get your project URL and anon key
-3. Update `src/supabase.js` with your credentials:
+1. Create a project at [supabase.com](https://supabase.com)
+2. Get your project URL and anon key from Settings > API
+3. Update `src/supabase.js` with your credentials
 
-```javascript
-const supabaseUrl = 'YOUR_SUPABASE_URL';
-const supabaseAnonKey = 'YOUR_SUPABASE_ANON_KEY';
-```
+### 3. Create the database table
 
-### 3. Database Setup
-
-Run the following SQL in your Supabase SQL Editor:
+In your Supabase SQL editor, run this:
 
 ```sql
--- Create tasks table
 CREATE TABLE public.tasks (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -61,10 +48,8 @@ CREATE TABLE public.tasks (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Enable Row Level Security
 ALTER TABLE public.tasks ENABLE ROW LEVEL SECURITY;
 
--- Create RLS policies
 CREATE POLICY "select_own" ON public.tasks 
   FOR SELECT USING (auth.uid() = user_id);
 
@@ -79,144 +64,45 @@ CREATE POLICY "delete_own" ON public.tasks
   FOR DELETE USING (auth.uid() = user_id);
 ```
 
-### 4. Run the App
+### 4. Run it
 
 ```bash
-# Start the development server
 npm start
-
-# Run on specific platforms
-npm run android  # Android
-npm run ios      # iOS (macOS only)
-npm run web      # Web browser
 ```
 
-## 📱 App Structure
+## How it works
 
-```
-src/
-├── components/
-│   └── TaskItem.js          # Individual task component
-├── screens/
-│   ├── AuthScreen.js        # Sign-up/Sign-in screen
-│   └── TasksScreen.js       # Main tasks management screen
-└── supabase.js              # Supabase client configuration
-```
+The app has two main screens:
+- **AuthScreen**: Handles sign up/sign in
+- **TasksScreen**: Shows your tasks and lets you add/edit/delete them
 
-## 🔐 Security Features
+Each task is tied to your user account, so you only see your own tasks. The real-time updates mean if you add a task on your phone, it'll show up on your computer too.
 
-### Row-Level Security (RLS)
-- All database operations are protected by RLS policies
-- Users can only access tasks where `user_id` matches their authenticated user ID
-- Policies cover SELECT, INSERT, UPDATE, and DELETE operations
+## Security stuff
 
-### Authentication
-- Secure email/password authentication via Supabase Auth
-- Session persistence using AsyncStorage
-- Automatic session refresh and restoration
-- Secure logout with session cleanup
+I used Supabase's Row Level Security (RLS) to make sure users can only see their own tasks. The database policies check that the `user_id` matches the logged-in user before allowing any operations.
 
-## 🧪 Testing RLS
+## Testing
 
-To verify Row-Level Security is working:
-
-1. Create two user accounts
+To make sure the security works:
+1. Create two accounts
 2. Add tasks with each account
-3. Verify each user only sees their own tasks
-4. Try accessing tasks via direct API calls (should fail for other users' data)
+3. Check that each user only sees their own tasks
 
-## 📱 User Stories Implemented
+## Building for production
 
-### Epic 1: Authentication ✅
-- **Story 1.1**: New users can sign up with email & password
-- **Story 1.2**: Returning users can sign in and stay signed in
-- **Story 1.3**: Users can log out at any time
-
-### Epic 2: Task Management ✅
-- **Story 2.1**: Add tasks with titles
-- **Story 2.2**: View tasks in chronological order
-- **Story 2.3**: Edit task titles and toggle completion
-- **Story 2.4**: Delete tasks
-
-### Epic 3: Row Level Security ✅
-- **Story 3.1**: RLS policies ensure data isolation
-- **Story 3.2**: Cross-user access attempts fail
-
-### Epic 4: Real-Time Updates ✅
-- **Story 4.1**: Task list auto-refreshes on changes
-- **Story 4.2**: User-friendly error handling
-
-### Epic 5: Documentation ✅
-- **Story 5.1**: Comprehensive README with setup instructions
-- **Story 5.2**: Clean code structure ready for deployment
-
-## 🚀 Deployment
-
-### Expo Build
 ```bash
-# Build for production
 expo build:android
 expo build:ios
 ```
 
-### Environment Variables
-For production, use environment variables for Supabase credentials:
+## Common issues
 
-```javascript
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
-```
+- **"Invalid API key"**: Double-check your Supabase credentials
+- **Tasks not showing**: Make sure you ran the SQL setup in Supabase
+- **App won't start**: Check that all dependencies are installed
 
-## 🐛 Troubleshooting
 
-### Common Issues
 
-1. **"Invalid API key"**: Check your Supabase URL and anon key
-2. **"RLS policy violation"**: Ensure RLS policies are correctly set up
-3. **"Network request failed"**: Check your internet connection and Supabase project status
-4. **Tasks not updating**: Verify real-time subscriptions are enabled in Supabase
 
-### Debug Mode
-Enable debug logging by adding to your Supabase client:
 
-```javascript
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    storage: AsyncStorage,
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: false,
-  },
-  db: {
-    schema: 'public',
-  },
-  realtime: {
-    params: {
-      eventsPerSecond: 10,
-    },
-  },
-});
-```
-
-## 📄 License
-
-MIT License - feel free to use this project as a starting point for your own apps!
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## 📞 Support
-
-For issues and questions:
-- Check the troubleshooting section above
-- Review Supabase documentation
-- Open an issue in this repository
-
----
-
-**Happy Task Managing! 🎉**
